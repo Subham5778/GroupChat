@@ -1,0 +1,36 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+
+class ReadThread implements Runnable {
+   private MulticastSocket socket;
+   private InetAddress group;
+   private int port;
+   private static final int MAX_LEN = 1000;
+
+   ReadThread(MulticastSocket var1, InetAddress var2, int var3) {
+      this.socket = var1;
+      this.group = var2;
+      this.port = var3;
+   }
+
+   public void run() {
+      while(!GroupChat.finished) {
+         byte[] var1 = new byte[1000];
+         DatagramPacket var2 = new DatagramPacket(var1, var1.length, this.group, this.port);
+
+         try {
+            this.socket.receive(var2);
+            String var3 = new String(var1, 0, var2.getLength(), "UTF-8");
+            if (!var3.startsWith(GroupChat.name)) {
+               System.out.println(var3);
+            }
+         } catch (IOException var5) {
+            System.out.println("Socket closed!");
+         }
+      }
+
+   }
+}
