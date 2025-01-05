@@ -1,0 +1,73 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.SocketException;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
+
+public class GroupChat {
+   private static final String TERMINATE = "Exit";
+   static String name;
+   static volatile boolean finished = false;
+   static Set<String> activeUsers = new HashSet();
+
+   public GroupChat() {
+   }
+
+   public static void main(String[] var0) {
+      if (var0.length != 2) {
+         System.out.println("Two arguments required: <multicast-host> <port-number>");
+      } else {
+         try {
+            InetAddress var1 = InetAddress.getByName(var0[0]);
+            int var2 = Integer.parseInt(var0[1]);
+            Scanner var3 = new Scanner(System.in);
+            System.out.print("Enter your name: ");
+            name = var3.nextLine();
+            activeUsers.add(name);
+            MulticastSocket var4 = new MulticastSocket(var2);
+            var4.setTimeToLive(0);
+            var4.joinGroup(var1);
+            Thread var5 = new Thread(new ReadThread(var4, var1, var2));
+            var5.start();
+            String var6 = name + " has joined the chat!";
+            byte[] var7 = var6.getBytes();
+            DatagramPacket var8 = new DatagramPacket(var7, var7.length, var1, var2);
+            var4.send(var8);
+            System.out.println("Start typing messages...\n");
+
+            while(true) {
+               String var9 = var3.nextLine();
+               if (var9.equalsIgnoreCase("Exit")) {
+                  finished = true;
+                  activeUsers.remove(name);
+                  String var15 = name + " has left the chat!";
+                  byte[] var16 = var15.getBytes();
+                  DatagramPacket var12 = new DatagramPacket(var16, var16.length, var1, var2);
+                  var4.send(var12);
+                  var4.leaveGroup(var1);
+                  var4.close();
+                  break;
+               }
+
+               String var10000 = name;
+               var9 = var10000 + " [" + String.valueOf(new Date()) + "]: " + var9;
+               byte[] var10 = var9.getBytes();
+               DatagramPacket var11 = new DatagramPacket(var10, var10.length, var1, var2);
+               var4.send(var11);
+            }
+         } catch (SocketException var13) {
+            System.out.println("Error creating socket");
+            var13.printStackTrace();
+         } catch (IOException var14) {
+            System.out.println("Error reading/writing from/to socket");
+            var14.printStackTrace();
+         }
+      }
+
+   }
+}
