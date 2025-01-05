@@ -1,5 +1,10 @@
 # GroupChat
-The provided Java code implements a simple group chat application using multicast sockets. The main class, GroupChat, manages the chat functionality, including joining and leaving the multicast group, sending messages, and handling user input. The ReadThread class is responsible for continuously reading messages from the multicast group and displaying them to the user.
-When the program starts, it prompts the user to enter their name and adds the user to the active users set. The program then joins the multicast group and spawns a separate thread (ReadThread) to handle incoming messages. The main thread handles user input and sends messages to the multicast group. Each message is prefixed with the sender's name and a timestamp.
-If the user types the termination command ("Exit"), the program notifies the group that the user has left, removes the user from the active users set, and closes the socket. The ReadThread continuously reads messages from the multicast group and displays them, ensuring that the main thread can focus on handling user input.
-This implementation allows multiple users to join a multicast group and communicate with each other in real-time. It includes features such as notifying others when a user joins or leaves the chat, and maintaining a set of active users. The use of MulticastSocket enables efficient group communication, making it suitable for real-time chat applications.
+MulticastSocket for Group Communication: The code uses MulticastSocket to enable group communication. This allows multiple clients to join a multicast group and send/receive messages to/from the group.
+
+Thread for Reading Messages: A separate thread (ReadThread) is spawned to continuously read messages from the multicast group. This ensures that the main thread can handle user input while the ReadThread handles incoming messages.
+
+Joining and Leaving the Group: The code includes logic for joining the multicast group using socket.joinGroup(group) and leaving the group using socket.leaveGroup(group). This ensures proper management of group membership.
+
+Message Broadcasting: Messages are broadcasted to the group using DatagramPacket and MulticastSocket.send(). Each message is prefixed with the sender's name and a timestamp to provide context.
+
+Handling User Input and Termination: The main thread handles user input and checks for the termination command ("Exit"). When a user types "Exit", the program notifies the group that the user has left, removes the user from the active users set, and closes the socket.
